@@ -30,7 +30,6 @@ export default function StudentManagerApp() {
         }
        }
        loadData && fetchData();
-       setLoadData(false)
     }, [api, loadData])
 
     const remove = async (id) => {
@@ -47,7 +46,7 @@ export default function StudentManagerApp() {
                 </div> : null
             }
             <InputStudent inputStudent={inputStudent} setLoadData={setLoadData} setInputStudent={setInputStudent} isCreate={isCreate} setIsCreate={setIsCreate} api={api}/>
-            <StudentList data={studentData} setLoadData={setLoadData} setInputStudent={setInputStudent} setIsCreate={setIsCreate} remove={remove} />
+            <StudentList data={studentData} setInputStudent={setInputStudent} setIsCreate={setIsCreate} remove={remove} />
         </div>
     )
 }

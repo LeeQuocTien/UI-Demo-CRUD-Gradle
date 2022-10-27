@@ -1,13 +1,12 @@
 
 
 
-export default function Student({student, setLoadData, setInputStudent, setIsCreate, remove}) {
+export default function Student({student, setInputStudent, setIsCreate, remove}) {
 
     const editStudent = (e) => {
         e.preventDefault();
         setInputStudent(student);
         setIsCreate(false);
-        setLoadData(true);
       }
 
     return(
