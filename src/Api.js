@@ -1,24 +1,24 @@
 import axios from "axios";
 
-class Api {
+const BASE_URL = "http://localhost:8080/api/students";
 
-    BASE_URL = "http://localhost:8080/api/students";
+const Api = {
 
     async getAll() {
-      return await axios.get(this.BASE_URL);
-    }
+        return await axios.get(BASE_URL);
+    },
 
     async create(item) {
-        return await axios.post(this.BASE_URL, item);
-      }
+        return await axios.post(BASE_URL, item);
+    },
   
     async update(item) {
-      return await axios.put(`${this.BASE_URL}/${item.id}`, item);
-    }
+        return await axios.put(`${BASE_URL}/${item.id}`, item);
+    },
   
     async delete(id) {
-        return await axios.delete(`${this.BASE_URL}/${id}`);
-      }
-  }
-  
-  export default Api;
+        return await axios.delete(`${BASE_URL}/${id}`);
+    },
+}
+
+export default Api;

@@ -1,41 +1,77 @@
 import NavBar from "./NavBar";
 import StudentList from "./StudentList";
 import InputStudent from "./InputField";
-import { useState ,useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
-import Api from "../Api";
+import api from "../Api";
 
 export default function StudentManagerApp() {
-    
-    const [inputStudent, setInputStudent] = useState({
+    const studentEntity = {
         name: "",
         email: "",
         age: "",
-      });
+    }
 
+    const [inputStudent, setInputStudent] = useState(studentEntity);
     const [studentData, setStudentData] = useState([])
     const [errorMessage, setErrorMessage] = useState(null)
     const [isCreate, setIsCreate] = useState(true)
-    const [loadData, setLoadData] = useState(true)
-    
-    const api = useMemo(() => new Api(), []);
-    
-    useEffect(() => {
-        const fetchData = async () => {
-          const result = await api.getAll();
-          if (!result.data) {
-            setErrorMessage(`Failed to load students: ${result.message}`)
-        } else {
-            setStudentData(result.data)
-        }
-       }
-       loadData && fetchData();
-       setLoadData(false)
-    }, [api, loadData])
+    const [updatedStudent, setUpdatedStudent] = useState(null)
 
-    const remove = async (id) => {
-        await api.delete(id);
-        setLoadData(true)
+    useEffect(() => {
+        api.getAll()
+        .then(response => setStudentData(response.data))
+        .catch(error => setErrorMessage(`Failed to load students: ${error}`))
+    }, [])
+
+    const changeHand = (e) => {
+        setInputStudent({
+            ...inputStudent,
+            [e.target.name]: e.target.value
+        })
+    };
+  
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (inputStudent.name && inputStudent.email && inputStudent.age) {
+    
+            let result = isCreate ? await api.create({"name": "asdas", "email": "mike@gmail.com", "age": 20}) : await api.update({"id": "1","name": "asdas", "email": "mike@gmail.com", "age": 20});
+
+            if (!result.data) {
+                setErrorMessage( `Failed to ${isCreate ? "create" : "update"} record: ${result.message}`)
+            } else {
+                const updatedData = [...studentData.slice(0, updatedStudent), result.data, ...studentData.slice(updatedStudent + 1)]
+                
+                isCreate ? setStudentData([...studentData, result.data]) : setStudentData([...updatedData])
+                setErrorMessage(null)
+                setInputStudent(studentEntity)
+                setIsCreate(true)
+            }
+        } else {
+            setErrorMessage("Please provide valid data");
+        }
+    }
+  
+    const cancelClick = (e) => {
+        e.preventDefault();
+        setInputStudent(studentEntity);
+        setIsCreate(true)
+    }
+
+    const handleClick = () => { setErrorMessage(null) }
+
+    const remove = ( id, indx ) => {
+        setErrorMessage(null) 
+        api.delete(id);
+        const deletedData = [...studentData.slice(0, indx), ...studentData.slice(indx + 1)]
+        setStudentData(deletedData)
+    }
+ 
+    const editStudent = (student, indx) => {
+        setErrorMessage(null)
+        setInputStudent(student);
+        setIsCreate(false);
+        setUpdatedStudent(indx)
     }
 
     return (
@@ -46,8 +82,8 @@ export default function StudentManagerApp() {
                     {errorMessage}
                 </div> : null
             }
-            <InputStudent inputStudent={inputStudent} setLoadData={setLoadData} setInputStudent={setInputStudent} isCreate={isCreate} setIsCreate={setIsCreate} api={api}/>
-            <StudentList data={studentData} setLoadData={setLoadData} setInputStudent={setInputStudent} setIsCreate={setIsCreate} remove={remove} />
+            <InputStudent inputStudent={inputStudent} isCreate={isCreate} cancelClick={cancelClick} handleSubmit={handleSubmit} changeHand={changeHand} handleClick={handleClick} />
+            <StudentList data={studentData} editStudent={editStudent} remove={remove} />
         </div>
     )
 }
