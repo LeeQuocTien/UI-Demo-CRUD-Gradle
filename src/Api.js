@@ -1,24 +1,22 @@
-import axios from "axios";
+const BASE_URL = "http://localhost:8080/api/students";
 
-class Api {
-
-    BASE_URL = "http://localhost:8080/api/students";
+const api = {
 
     async getAll() {
-      return await axios.get(this.BASE_URL);
-    }
+        return await fetch(BASE_URL, { method: 'GET' });
+    },
 
     async create(item) {
-        return await axios.post(this.BASE_URL, item);
-      }
+        return await fetch(BASE_URL, { method: 'POST', body: JSON.stringify(item) });
+    },
   
     async update(item) {
-      return await axios.put(`${this.BASE_URL}/${item.id}`, item);
-    }
+        return await fetch(BASE_URL/item.id, { method: 'PUT', body: JSON.stringify(item) });
+    },
   
     async delete(id) {
-        return await axios.delete(`${this.BASE_URL}/${id}`);
-      }
-  }
-  
-  export default Api;
+        return await fetch(BASE_URL/id, { method: 'DELETE' });
+    },
+}
+
+export default api;

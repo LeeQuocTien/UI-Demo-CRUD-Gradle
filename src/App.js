@@ -1,12 +1,35 @@
-import './App.css';
-import StudentManagerApp from './components/StudentManagerApp';
+import NavBar from "./components/NavBar/NavBar";
+import StudentList from "./components/StudentList/StudentList";
+import InputStudent from "./components/InputField";
+import { useState, useEffect } from "react";
 
-function App() {
-  return (
-    <div>
-      <StudentManagerApp />
-    </div>
-  );
+import api from "./api";
+
+export default function StudentManagerApp() {
+
+    const [studentData, setStudentData] = useState([])
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [updatedStudent, setUpdatedStudent] = useState(null)
+
+    useEffect(() => {
+        api.getAll()
+        .then(response => setStudentData(response.data))
+        .catch(error => setErrorMessage(`Failed to load students: ${error.message}`))
+    }, [])
+
+    return (
+        <div className="container">
+            <NavBar />
+            {errorMessage ?
+                <div style={{backgroundColor: "red", width:"50%"}}>
+                    {errorMessage}
+                </div> : null
+            }
+            <InputStudent   updatedStudent={updatedStudent}
+                            studentData={studentData} 
+                            setStudentData={setStudentData} 
+                            setUpdatedStudent={setUpdatedStudent} />
+            <StudentList data={studentData} setUpdatedStudent={setUpdatedStudent} setStudentData={setStudentData} />
+        </div>
+    )
 }
-
-export default App;

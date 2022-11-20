@@ -1,66 +1,76 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function InputStudent({inputStudent, setLoadData, setInputStudent, isCreate, setIsCreate, api}) {
+import api from "../api";
 
-  const [errorInputMessage, setErrorInputMessage] = useState(null)
+export default function InputStudent({ updatedStudent, studentData, setStudentData, setUpdatedStudent }) {
 
-  const changeHand = (e) => {
-    setInputStudent({
-        ...inputStudent,
-        [e.target.name]: e.target.value
-    })
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (inputStudent.name && inputStudent.email && inputStudent.age) {
-
-      let result = isCreate ? await api.create(inputStudent) : await api.update(inputStudent);
-    
-      if (!result.data) {
-        setErrorInputMessage( `Failed to ${isCreate ? "create" : "update"} record: ${result.message}`)
-      } else {
-        setErrorInputMessage(null);
-        setInputStudent({
-          name: "",
-          email: "",
-          age: "",
-        });
-        setIsCreate(true)
-        setLoadData(true)
-      }
-    } else {
-        setErrorInputMessage("Please provide valid data");
+    const studentEntity = {
+        name: "",
+        email: "",
+        age: "",
     }
-  }
 
-  const cancelClick = (e) => {
-    e.preventDefault();
-    setInputStudent({
-      name: "",
-      email: "",
-      age: "",
-    });
-    setIsCreate(true)
-  }
+    useEffect(() => {
+        updatedStudent && setInputStudent(updatedStudent)
+    },[updatedStudent])
 
-  return (
-      <div className="input-field">
-          {errorInputMessage ?
-            <div style={{backgroundColor: "red", width:"50%"}}>
-                {errorInputMessage}
-            </div> : null
-          }
+    const [inputStudent, setInputStudent] = useState(studentEntity);
+    const [errorMessage, setErrorMessage] = useState(null)
 
-          <form className="input-field__form" action="" onSubmit={handleSubmit}>
-              <input placeholder="Student Name" className="input-field__form-input" type="text" name="name" value={inputStudent.name} onChange={(e) => changeHand(e)} onClick={() => setErrorInputMessage(null)} />
-              <input placeholder="Student Email" className="input-field__form-input" type="text" name="email" value={inputStudent.email} onChange={(e) => changeHand(e)} onClick={() => setErrorInputMessage(null)} />
-              <input placeholder="Student Age" className="input-field__form-input" type="text" name="age" value={inputStudent.age} onChange={(e) => changeHand(e)} onClick={() => setErrorInputMessage(null)} />
-              <div>
-                <button className="input-field__form-button">{isCreate ? "Add Student" : "Update Student"}</button>
-                <button className="input-field__form-button" onClick={cancelClick}>Cancel</button>
-              </div>
-          </form>
-      </div>
+    const updatedStudentIndx = updatedStudent && studentData.findIndex((student) => student.id === updatedStudent.id)
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (inputStudent.name && inputStudent.email && inputStudent.age) {
+            let result = updatedStudentIndx === null ? await api.create(inputStudent) : await api.update(inputStudent);
+
+            if (!result.data) {
+                setErrorMessage( `Failed to ${!updatedStudentIndx ? "create" : "update"} record: ${result.message}`)
+            } else {
+                const updatedData = [...studentData.slice(0, updatedStudentIndx), result.data, ...studentData.slice(updatedStudentIndx + 1)]
+
+                updatedStudentIndx === null ? setStudentData([...studentData, result.data]) : setStudentData([...updatedData])
+                setInputStudent(studentEntity)
+                setUpdatedStudent(null)
+            }
+        } else {
+            setErrorMessage("Please provide valid data");
+        }
+    }
+
+    const changeHand = (e) => {
+        setErrorMessage(null)
+        setInputStudent({
+            ...inputStudent,
+            [e.target.name]: e.target.value
+        })
+    };
+
+    const cancelClick = (e) => {
+        e.preventDefault();
+        setInputStudent(studentEntity);
+        setUpdatedStudent(null)
+    }
+
+    return (
+        <>
+            {errorMessage ?
+                <div style={{backgroundColor: "red", width:"50%"}}>
+                    {errorMessage}
+                </div> : null
+            }
+
+            <div className="input-field">
+                <form className="input-field__form" action="" onSubmit={handleSubmit}>
+                    <input placeholder="Student Name" className="input-field__form-input" type="text" name="name" value={inputStudent.name} onChange={(e) => changeHand(e)} />
+                    <input placeholder="Student Email" className="input-field__form-input" type="text" name="email" value={inputStudent.email} onChange={(e) => changeHand(e)} />
+                    <input placeholder="Student Age" className="input-field__form-input" type="text" name="age" value={inputStudent.age} onChange={(e) => changeHand(e)} />
+                    <div>
+                        <button className="input-field__form-button">{ updatedStudentIndx === null ? "Add Student" : "Update Student" }</button>
+                        <button className="input-field__form-button" onClick={ cancelClick }>Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </>
   )
 }
