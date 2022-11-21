@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import api from "../api";
+import api from "../Api";
 
 export default function InputStudent({ updatedStudent, studentData, setStudentData, setUpdatedStudent }) {
 
@@ -10,12 +10,12 @@ export default function InputStudent({ updatedStudent, studentData, setStudentDa
         age: "",
     }
 
+    const [inputStudent, setInputStudent] = useState(studentEntity);
+    const [errorMessage, setErrorMessage] = useState(null)
+
     useEffect(() => {
         updatedStudent && setInputStudent(updatedStudent)
     },[updatedStudent])
-
-    const [inputStudent, setInputStudent] = useState(studentEntity);
-    const [errorMessage, setErrorMessage] = useState(null)
 
     const updatedStudentIndx = updatedStudent && studentData.findIndex((student) => student.id === updatedStudent.id)
 
@@ -67,7 +67,7 @@ export default function InputStudent({ updatedStudent, studentData, setStudentDa
                     <input placeholder="Student Age" className="input-field__form-input" type="text" name="age" value={inputStudent.age} onChange={(e) => changeHand(e)} />
                     <div>
                         <button className="input-field__form-button">{ updatedStudentIndx === null ? "Add Student" : "Update Student" }</button>
-                        <button className="input-field__form-button" onClick={ cancelClick }>Cancel</button>
+                        <button className="input-field__form-button" onClick={ cancelClick }>Cancell</button>
                     </div>
                 </form>
             </div>

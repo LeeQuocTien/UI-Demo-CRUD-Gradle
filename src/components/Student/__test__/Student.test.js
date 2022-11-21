@@ -22,10 +22,11 @@ test('should render all element in student element', () => {
   expect(removeButton).toBeInTheDocument();
 });
 
-test('should able to click editStudent Button', () => {
+test('should able to click editStudent Button.', () => {
     render(<Student student={{}} remove={mockRemove} editStudent={mockeditStudent} />);
     const editStudentButton = screen.getByText(/Edit/i);
     
+    expect(editStudentButton).toBeInTheDocument()
     fireEvent.click(editStudentButton)
     expect(mockeditStudent).toBeCalled()
 });

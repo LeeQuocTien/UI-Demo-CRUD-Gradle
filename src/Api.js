@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:8080/api/students";
 
-const api = {
+const Api = {
 
     async getAll() {
         return await fetch(BASE_URL, { method: 'GET' });
@@ -19,4 +19,4 @@ const api = {
     },
 }
 
-export default api;
+export default Api;

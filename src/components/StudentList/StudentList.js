@@ -1,5 +1,5 @@
 import Student from "../Student/Student"
-import api from "../../api";
+import api from "../../Api";
 
 export default function StudentList({ data, setStudentData, setUpdatedStudent }) {
 
