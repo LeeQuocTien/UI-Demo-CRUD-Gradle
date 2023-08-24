@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import api from "../Api";
+import api from "../../Api";
 
-export default function InputStudent({ updatedStudent, studentData, setStudentData, setUpdatedStudent }) {
+export default function InputStudent({ studentData, updatedStudent, setStudentData, setUpdatedStudent }) {
 
     const studentEntity = {
         name: "",
@@ -15,23 +15,30 @@ export default function InputStudent({ updatedStudent, studentData, setStudentDa
 
     useEffect(() => {
         updatedStudent && setInputStudent(updatedStudent)
-    },[updatedStudent])
+    }, [updatedStudent])
 
     const updatedStudentIndx = updatedStudent && studentData.findIndex((student) => student.id === updatedStudent.id)
+
+    const fetchSuccess = (response) => {
+        const updatedData = [...studentData.slice(0, updatedStudentIndx), response.data, ...studentData.slice(updatedStudentIndx + 1)]
+
+        updatedStudentIndx === null ? setStudentData([...studentData, response.data]) : setStudentData([...updatedData])
+        setInputStudent(studentEntity)
+        setUpdatedStudent(null)
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (inputStudent.name && inputStudent.email && inputStudent.age) {
-            let result = updatedStudentIndx === null ? await api.create(inputStudent) : await api.update(inputStudent);
 
-            if (!result.data) {
-                setErrorMessage( `Failed to ${!updatedStudentIndx ? "create" : "update"} record: ${result.message}`)
+            if(updatedStudentIndx === null) {
+                await api.create(inputStudent)
+                .then( response => fetchSuccess(response))
+                .catch(error => setErrorMessage(`Failed to create with record: ${error.message}`))
             } else {
-                const updatedData = [...studentData.slice(0, updatedStudentIndx), result.data, ...studentData.slice(updatedStudentIndx + 1)]
-
-                updatedStudentIndx === null ? setStudentData([...studentData, result.data]) : setStudentData([...updatedData])
-                setInputStudent(studentEntity)
-                setUpdatedStudent(null)
+                await api.update(inputStudent)
+                .then(response => fetchSuccess(response))
+                .catch(error => setErrorMessage(`Failed to update with record: ${error.message}`))
             }
         } else {
             setErrorMessage("Please provide valid data");
@@ -55,7 +62,7 @@ export default function InputStudent({ updatedStudent, studentData, setStudentDa
     return (
         <>
             {errorMessage ?
-                <div style={{backgroundColor: "red", width:"50%"}}>
+                <div data-testid="input-message" style={{backgroundColor: "red", width:"50%"}}>
                     {errorMessage}
                 </div> : null
             }
@@ -67,7 +74,7 @@ export default function InputStudent({ updatedStudent, studentData, setStudentDa
                     <input placeholder="Student Age" className="input-field__form-input" type="text" name="age" value={inputStudent.age} onChange={(e) => changeHand(e)} />
                     <div>
                         <button className="input-field__form-button">{ updatedStudentIndx === null ? "Add Student" : "Update Student" }</button>
-                        <button className="input-field__form-button" onClick={ cancelClick }>Cancell</button>
+                        <button className="input-field__form-button" onClick={ cancelClick }>Cancel</button>
                     </div>
                 </form>
             </div>

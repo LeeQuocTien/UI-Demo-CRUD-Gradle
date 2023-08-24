@@ -1,7 +1,6 @@
 export default function Student({student, remove, editStudent}) {
-
     return(
-        <div className="student" data-testid={`student-${student.id}`} >
+        <div className="student" data-testid={`student-div-${student.id}`} >
             <div className="student-inf-id">ID: {student.id}</div>
             <div className="student-inf">Name: {student.name}</div>
             <div className="student-inf">Email: {student.email}</div>

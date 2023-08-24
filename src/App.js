@@ -1,6 +1,6 @@
 import NavBar from "./components/NavBar/NavBar";
 import StudentList from "./components/StudentList/StudentList";
-import InputStudent from "./components/InputField";
+import InputStudent from "./components/InputField/InputField";
 import React from "react";
 
 import api from "./Api";
